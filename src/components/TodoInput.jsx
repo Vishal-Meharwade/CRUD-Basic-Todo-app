@@ -1,27 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 export default function TodoInput(props) {
-  const { handleNewTodos, todoValue, setTodoValue} = props;
+  const {
+    handleNewTodos,
+    handleUpdateTodo,
+    todoValue,
+    setTodoValue,
+    isEditing,
+  } = props;
+  const [isShaking, setIsShaking] = useState(false);
+  const inputRef = useRef(null);
 
-  // const [todoValue, setTodoValue] = useState("");
+  const handleSubmit = () => {
+    if (todoValue.trim() !== "") {
+      if (isEditing) {
+        handleUpdateTodo();
+      } else {
+        handleNewTodos(todoValue);
+      }
+      setTodoValue("");
+    } else {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 820);
+    }
+  };
 
   return (
     <header>
+      <h1 className="header-title">Todo List</h1>
       <input
+        ref={inputRef}
+        className={isShaking ? "shake" : ""}
         value={todoValue}
         onChange={(e) => {
           setTodoValue(e.target.value);
         }}
         placeholder="Enter todo..."
-      />
-      <button
-        onClick={() => {
-          handleNewTodos(todoValue);
-          setTodoValue('')
+        onKeyPress={(e) => {
+          if (e.key === "Enter") {
+            handleSubmit();
+          }
         }}
-      >
-        Add
-      </button>
+      />
+      <button onClick={handleSubmit}>{isEditing ? "Update" : "Add"}</button>
     </header>
   );
 }
